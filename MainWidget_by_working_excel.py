@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'MainWidget_by_working_excel_2.ui'
+## Form generated from reading UI file 'MainWidget_by_working_excel.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.7.3
 ##
