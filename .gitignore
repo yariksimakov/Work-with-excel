@@ -1,0 +1,5 @@
+\__pycache__
+\.idea
+database.py
+__inite__.py
+employers.db

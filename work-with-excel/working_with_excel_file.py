@@ -1,5 +1,4 @@
 from pprint import pprint
-import xlwings as xw
 import pandas as pd
 import openpyxl
 
@@ -33,14 +32,5 @@ def test_start(object_class):
 	change_excel_file.save_changed_excel_file(excel_file_old + '.2' + '.xlsx')
 
 
-class CreateNewExcelFileByTemplate:
-	def __init__(self, path_to_directory_where_file_will_be_created:str,  path_to_template:str = r"D:\Python Projects\Application\work-with-excel\Krasnopol.xlsx"):
-		wb = xw.Book(path_to_template)
-		sheet = wb.sheets[sheet_name]
-		print(sheet['B10'])
-
-
-
-
 if __name__ == '__main__':
-	CreateNewExcelFileByTemplate('pass')
+	pass

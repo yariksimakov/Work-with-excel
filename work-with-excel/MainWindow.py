@@ -41,11 +41,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 			nextIndexColumn = current.sibling(0, current.column() + 1)
 			if nextIndex.isValid():
 				self.tableWidget_CC.setCurrentIndex(nextIndex)
-				self.tableWidget_CC.edit(nextIndex)
+				# self.tableWidget_CC.edit(nextIndex)
 			elif nextIndexColumn.isValid():
 				# self.tableWidget_CC.closeEditor(current)
 				self.tableWidget_CC.setCurrentIndex(nextIndexColumn)
-				self.tableWidget_CC.edit(nextIndexColumn)
+				# self.tableWidget_CC.edit(nextIndexColumn)
 			
 			return super().eventFilter(source, event)
 		return super().eventFilter(source, event)
