@@ -1,8 +1,8 @@
 from PySide6.QtWidgets import QMainWindow, QFileDialog, QLineEdit
 from PySide6.QtCore import Slot, Signal, Qt, QEvent
-import pickle
+import pickle, os
 
-from MainWidget_by_working_excel_2 import Ui_MainWindow
+from MainWidget_by_working_excel import Ui_MainWindow
 
 
 class TableForWorkExcelFile():
@@ -17,7 +17,7 @@ class TableForWorkExcelFile():
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
-	__path_to_file_save_lineEdit = 'save_params\\linEdit_excel_file.pkl'
+	__path_to_file_save_lineEdit = 'save_params/linEdit_excel_file.pkl'
 	
 	def __init__(self, parent=None):
 		super(MainWindow, self).__init__(parent)
@@ -41,11 +41,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 			nextIndexColumn = current.sibling(0, current.column() + 1)
 			if nextIndex.isValid():
 				self.tableWidget_CC.setCurrentIndex(nextIndex)
-				self.tableWidget_CC.edit(nextIndex)
+			# self.tableWidget_CC.edit(nextIndex)
 			elif nextIndexColumn.isValid():
 				# self.tableWidget_CC.closeEditor(current)
 				self.tableWidget_CC.setCurrentIndex(nextIndexColumn)
-				self.tableWidget_CC.edit(nextIndexColumn)
+			# self.tableWidget_CC.edit(nextIndexColumn)
 			
 			return super().eventFilter(source, event)
 		return super().eventFilter(source, event)
@@ -88,6 +88,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 	
 	@Slot()
 	def save_default_settings(self):
+		is_there_a_dirictory = False
+		for el in os.listdir():
+			if el == 'save_params':
+				is_there_a_dirictory = True
+		if not is_there_a_dirictory:
+			os.mkdir('save_params')
 		data_line = (self.lineEdit_excel_template.text(),
 		             self.lineEdit_path_creating_file.text(),
 		             self.lineEdit_plate_info.text())
@@ -110,7 +116,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 if __name__ == '__main__':
 	"""https://ru.stackoverflow.com/questions/1538874/%D0%9D%D0%B0%D0%B6%D0%B0%D1%82%D0%B8%D0%B5-%D0%BA%D0%BB%D0%B0%D0%B2%D0%B8%D1%88%D0%B8-enter-%D0%B2-%D1%82%D0%B0%D0%B1%D0%BB%D0%B8%D1%86%D0%B5-qtablewidget"""
-	with open('save_params\\linEdit_excel_file.pkl', 'rb') as file:
+	with open('save_params/linEdit_excel_file.pkl', 'rb') as file:
 		param = pickle.load(file)
 	
 	print(param)
