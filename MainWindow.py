@@ -86,8 +86,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		filename = QFileDialog.getOpenFileName()
 		self.lineEdit_plate_info.setText(filename[0])
 	
-	def get_bool_checking_directory(self, directory: str, path: str = '') -> bool:
-		if directory in set(os.listdir()):
+	def get_bool_checking_directory(self, path_directory: str) -> bool:
+		if path_directory in set(os.listdir()):
 			return True
 		return False
 	

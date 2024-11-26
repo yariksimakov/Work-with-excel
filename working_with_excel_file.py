@@ -1,27 +1,31 @@
 import os
-
 import openpyxl
 
 
-test_direction: str = r'test direction\\'
-file_name = 'Krasnopol'
-expanded: str = '.xlsx'
+test_direction: str = r"test direction\\"
+file_name = r'Krasnopol'
+expanded: str = r'.xlsx'
 
 
 # data = pd.read_excel(excel_file_old + expanded)
 # data.to_excel(excel_file_old + '.2' + expanded)
 
 class GetExpandedFile:
-	def get_index_for_last_file(self, direction:str) -> int:
+	def get_index_for_last_file(self, direction:str, file_check: str) -> int:
 		"""
-		:return: -1 if index is Not else integer index
+		direction - Директория в которой будут искаться файлы
+		file_check - Файл который будут искать в direction
+		:return: -1 if there is no file
+			0 if file have not index
+			else return the index of the last file
 		"""
 		set_files = set(os.listdir(direction))
+		
 		for index in range(101):
 			if index != 0:
-				file = file_name + f'.{index}' + expanded
+				file = file_check + f'.{index}' + expanded
 			else:
-				file = file_name + expanded
+				file = file_check + expanded
 			if not file in set_files:
 				return index - 1
 
@@ -49,7 +53,6 @@ def test_start(object_class):
 
 if __name__ == '__main__':
 	# test_start(ModifyExistingExcelFile)
-	test = GetExpandedFile().get_index_for_last_file(
-		test_direction)
+	test = GetExpandedFile().get_index_for_last_file(test_direction, file_name)
 	print(test)
 	# pass
