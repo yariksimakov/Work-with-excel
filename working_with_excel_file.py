@@ -1,10 +1,9 @@
 import os
 import openpyxl
-
+from settings.settings import EXPANDED
 
 test_direction: str = r"test direction\\"
 file_name = r'Krasnopol'
-expanded: str = r'.xlsx'
 
 
 # data = pd.read_excel(excel_file_old + expanded)
@@ -29,8 +28,11 @@ class GetExpandedFile:
 			if not file in set_files:
 				return index - 1
 
-class ModifyExistingExcelFile:
-	def __init__(self, name_excel_file, name_sheet='Сопроводительный лист'):
+class ModifyExistingExcelFile(GetExpandedFile):
+	def __init__(self, path_by_directory:str, name_excel_file:str, name_sheet='Сопроводительный лист'):
+		
+		last_index_file = self.get_index_for_last_file(path_by_directory, name_excel_file)
+		
 		self.wb = openpyxl.load_workbook(name_excel_file)
 		self.sheet = self.wb[name_sheet]
 	
@@ -53,6 +55,6 @@ def test_start(object_class):
 
 if __name__ == '__main__':
 	# test_start(ModifyExistingExcelFile)
-	test = GetExpandedFile().get_index_for_last_file(test_direction, file_name)
-	print(test)
+	# test = GetExpandedFile().get_index_for_last_file(test_direction, file_name)
+	print(EXPANDED)
 	# pass

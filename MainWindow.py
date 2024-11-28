@@ -2,7 +2,8 @@ from PySide6.QtWidgets import QMainWindow, QFileDialog, QLineEdit
 from PySide6.QtCore import Slot, Signal, Qt, QEvent
 import pickle, os
 from MainWidget_by_working_excel import Ui_MainWindow
-from settings.settings import DIRECTION_BY_SAVE_DATA_PATH, LINE_EDIT
+from settings.settings import DIRECTION_BY_SAVE, LINE_EDIT
+from working_with_excel_file import ModifyExistingExcelFile
 
 
 class TableForWorkExcelFile():
@@ -17,7 +18,7 @@ class TableForWorkExcelFile():
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
-	__path_to_file_save_lineEdit = DIRECTION_BY_SAVE_DATA_PATH + '/' + LINE_EDIT
+	__path_to_file_save_lineEdit = DIRECTION_BY_SAVE + '/' + LINE_EDIT
 	
 	def __init__(self, parent=None):
 		super(MainWindow, self).__init__(parent)
@@ -33,6 +34,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		TableForWorkExcelFile(self)
 		self.tableWidget_CC.installEventFilter(self)
 		self.pushButton_create_CC.clicked.connect(self.create_new_excel_by_template)
+		
+		
 	
 	def eventFilter(self, source, event):
 		if (event.type() == QEvent.KeyPress and event.key() in (Qt.Key_Return, Qt.Key_Enter)):
@@ -52,6 +55,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 	
 	def create_new_excel_by_template(self):
 		data_table_CC = self.get_data_by_table_CC()
+		
 		print(data_table_CC)
 	
 	def get_data_by_table_CC(self) -> list:
@@ -93,8 +97,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 	
 	@Slot()
 	def save_default_settings(self):
-		if not self.get_bool_checking_directory(DIRECTION_BY_SAVE_DATA_PATH):
-			os.mkdir(DIRECTION_BY_SAVE_DATA_PATH)
+		if not self.get_bool_checking_directory(DIRECTION_BY_SAVE):
+			os.mkdir(DIRECTION_BY_SAVE)
 		
 		data_line = (self.lineEdit_excel_template.text(),
 		             self.lineEdit_path_creating_file.text(),
@@ -103,7 +107,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 			pickle.dump(data_line, file)
 	
 	def load_data_for_lineEdit(self):
-		if not self.get_bool_checking_directory(DIRECTION_BY_SAVE_DATA_PATH):
+		if not self.get_bool_checking_directory(DIRECTION_BY_SAVE):
 			self.save_default_settings()
 		
 		with open(self.__path_to_file_save_lineEdit, 'rb') as file:

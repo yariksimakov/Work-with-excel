@@ -1,6 +1,7 @@
 \__pycache__
 \.idea
 \test direction
+\.venv
 database.py
 __inite__.py
 employers.db
