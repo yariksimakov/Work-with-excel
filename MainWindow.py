@@ -1,8 +1,9 @@
 from PySide6.QtWidgets import QMainWindow, QFileDialog, QLineEdit
 from PySide6.QtCore import Slot, Signal, Qt, QEvent
 import pickle, os
-
 from MainWidget_by_working_excel import Ui_MainWindow
+from settings.settings import DIRECTION_BY_SAVE, LINE_EDIT
+from working_with_excel_file import ModifyExistingExcelFile
 
 
 class TableForWorkExcelFile():
@@ -17,7 +18,7 @@ class TableForWorkExcelFile():
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
-	__path_to_file_save_lineEdit = 'save_params/linEdit_excel_file.pkl'
+	__path_to_file_save_lineEdit = DIRECTION_BY_SAVE + '/' + LINE_EDIT
 	
 	def __init__(self, parent=None):
 		super(MainWindow, self).__init__(parent)
@@ -33,6 +34,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		TableForWorkExcelFile(self)
 		self.tableWidget_CC.installEventFilter(self)
 		self.pushButton_create_CC.clicked.connect(self.create_new_excel_by_template)
+		
+		
 	
 	def eventFilter(self, source, event):
 		if (event.type() == QEvent.KeyPress and event.key() in (Qt.Key_Return, Qt.Key_Enter)):
@@ -51,10 +54,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		return super().eventFilter(source, event)
 	
 	def create_new_excel_by_template(self):
-		data_table_CC = self.get_to_file_data()
+		data_table_CC = self.get_data_by_table_CC()
+		
 		print(data_table_CC)
 	
-	def get_to_file_data(self) -> list:
+	def get_data_by_table_CC(self) -> list:
 		"""
 		:return: [(cell, data_cell),(cell, data_cell), ...]
 		"""
@@ -86,22 +90,26 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		filename = QFileDialog.getOpenFileName()
 		self.lineEdit_plate_info.setText(filename[0])
 	
+	def get_bool_checking_directory(self, path_directory: str) -> bool:
+		if path_directory in set(os.listdir()):
+			return True
+		return False
+	
 	@Slot()
 	def save_default_settings(self):
-		is_there_a_dirictory = False
-		for el in os.listdir():
-			if el == 'save_params':
-				is_there_a_dirictory = True
-		if not is_there_a_dirictory:
-			os.mkdir('save_params')
+		if not self.get_bool_checking_directory(DIRECTION_BY_SAVE):
+			os.mkdir(DIRECTION_BY_SAVE)
+		
 		data_line = (self.lineEdit_excel_template.text(),
 		             self.lineEdit_path_creating_file.text(),
 		             self.lineEdit_plate_info.text())
-		
 		with open(self.__path_to_file_save_lineEdit, 'wb') as file:
 			pickle.dump(data_line, file)
 	
 	def load_data_for_lineEdit(self):
+		if not self.get_bool_checking_directory(DIRECTION_BY_SAVE):
+			self.save_default_settings()
+		
 		with open(self.__path_to_file_save_lineEdit, 'rb') as file:
 			path_by_settings: tuple = pickle.load(file)
 			lineEdit_object: tuple = (
