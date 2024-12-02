@@ -36,7 +36,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.pushButton_create_CC.clicked.connect(self.create_new_excel_by_template)
 		
 		
-	
 	def eventFilter(self, source, event):
 		if (event.type() == QEvent.KeyPress and event.key() in (Qt.Key_Return, Qt.Key_Enter)):
 			current = self.tableWidget_CC.currentIndex()
