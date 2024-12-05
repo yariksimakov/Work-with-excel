@@ -1,9 +1,9 @@
 from PySide6.QtWidgets import QMainWindow, QFileDialog, QLineEdit
 from PySide6.QtCore import Slot, Signal, Qt, QEvent
-import pickle, os
+import pickle, os, re
 from MainWidget_by_working_excel import Ui_MainWindow
 from settings.settings import DIRECTION_BY_SAVE, LINE_EDIT
-from working_with_excel_file import ModifyExistingExcelFile
+from working_with_excel_file import ModifyExistingExcelFile, Worker
 
 
 class TableForWorkExcelFile():
@@ -18,7 +18,7 @@ class TableForWorkExcelFile():
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
-	__path_to_file_save_lineEdit = DIRECTION_BY_SAVE + '/' + LINE_EDIT
+	__path_to_file_save_lineEdit = DIRECTION_BY_SAVE + r'\\' + LINE_EDIT
 	
 	def __init__(self, parent=None):
 		super(MainWindow, self).__init__(parent)
@@ -54,8 +54,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 	
 	def create_new_excel_by_template(self):
 		data_table_CC = self.get_data_by_table_CC()
-		
-		print(data_table_CC)
+		name_new_excel_file = self.lineEdit_number_CC.text()
+
+		match = re.fullmatch(r'\d{5,}', name_new_excel_file)
+		if not match:
+			raise ValueError('Неправильно набран номер эксель файла')
+
+		excel_template = self.lineEdit_excel_template.text()
+		path_creating_file = self.lineEdit_path_creating_file.text()
+
+		create_new_excel_file = ModifyExistingExcelFile(path_creating_file, excel_template, name_new_excel_file)
+		Worker(create_new_excel_file.save_changed_excel_file)
 	
 	def get_data_by_table_CC(self) -> list:
 		"""
@@ -118,7 +127,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 				if path:
 					lineEdit_object[index].setText(path)
 			
-			del path_by_settings, lineEdit_object
 
 
 if __name__ == '__main__':

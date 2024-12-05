@@ -1,7 +1,8 @@
 \__pycache__
 \.idea
+\.gigaide
 \test direction
-\.venv
+\venv
 database.py
 __inite__.py
 employers.db
