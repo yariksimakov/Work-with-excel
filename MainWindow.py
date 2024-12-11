@@ -1,9 +1,46 @@
 from PySide6.QtWidgets import QMainWindow, QFileDialog, QLineEdit
 from PySide6.QtCore import Slot, Signal, Qt, QEvent, QThreadPool
-import pickle, os, re
+from PySide6.QtCore import QObject, Slot, Signal, QThreadPool, QRunnable
 from MainWidget_by_working_excel import Ui_MainWindow
+
 from settings.settings import DIRECTION_BY_SAVE, LINE_EDIT
-from working_with_excel_file import ModifyExistingExcelFile, Worker
+from working_with_excel_file import ModifyExistingExcelFile
+import pickle, os, re, traceback, sys
+
+
+class WorkerSignals(QRunnable):
+	finished = Signal()
+	error = Signal(tuple)
+	result = Signal(object)
+	progress = Signal(int)
+
+
+class WorkerThreads(QRunnable):
+	def __init__(self, fn, *args, **kwargs):
+		super().__init__()
+		self.fn = fn
+		self.args = args
+		self.kwargs = kwargs
+		self.signals = WorkerSignals()
+
+		self.threadpool = QThreadPool()
+		print(f"Multithreading with maxim {self.threadpool.maxThreadCount()} threads")
+
+	# self.kwargs['progress_callback'] = self.signals.progress
+
+	@Slot()
+	def run(self):
+		try:
+			result = self.fn(*self.args, **self.kwargs)
+		except:
+			traceback.print_exc()
+			exctype, value = sys.exc_info()[:2]
+			self.signals.error.emit((exctype, value, traceback.format_exc()))
+		else:
+			self.signals.result.emit(result)
+		finally:
+			self.signals.finished.emit()
+
 
 
 class TableForWorkExcelFile():
@@ -34,7 +71,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.threadpool = QThreadPool()
 		TableForWorkExcelFile(self)
 		self.tableWidget_CC.installEventFilter(self)
-		self.pushButton_create_CC.clicked.connect(self.create_new_excel_by_template)
+		self.pushButton_create_CC.clicked.connect(self.create_excel_file_by_template_using_external_thread)
 
 	def eventFilter(self, source, event):
 		if (event.type() == QEvent.KeyPress and event.key() in (Qt.Key_Return, Qt.Key_Enter)):
@@ -49,12 +86,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 				# self.tableWidget_CC.closeEditor(current)
 				self.tableWidget_CC.setCurrentIndex(nextIndexColumn)
 			# self.tableWidget_CC.edit(nextIndexColumn)
-
 			return super().eventFilter(source, event)
 		return super().eventFilter(source, event)
 
-	def create_new_excel_by_template(self):
-		data_table_CC = self.get_data_by_table_CC()
+	def create_excel_file_by_template_using_external_thread(self):
+		data_table_CC = self.get_data_from_table_CC()
 		name_new_excel_file = self.lineEdit_number_CC.text()
 
 		match = re.fullmatch(r'\d{5,}', name_new_excel_file)
@@ -63,14 +99,36 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 		excel_template = self.lineEdit_excel_template.text()
 		path_creating_file = self.lineEdit_path_creating_file.text()
+
+		worker = WorkerThreads(self.create_excel_file_by_template,
+							   path_creating_file, excel_template,
+							   name_new_excel_file, data_table_CC)
+		self.threadpool.start(worker)
+
+		# worker.signals.result.connect(self.print_output)
+		worker.signals.finished.connect(self.thread_complete)
+		# worker.signals.progress.connect()
+
+	def create_excel_file_by_template(self, path_creating_file, excel_template, name_new_excel_file, data_table_CC):
 		create_new_excel_file = ModifyExistingExcelFile(path_creating_file, excel_template, name_new_excel_file)
 		if data_table_CC:
 			for cell, data in data_table_CC:
 				create_new_excel_file.mode_excel_file(cell, data)
-		worker = Worker(create_new_excel_file.save_changed_excel_file)
-		self.threadpool.start(worker)
 
-	def get_data_by_table_CC(self) -> list:
+		create_new_excel_file.save_changed_excel_file()
+
+
+	# def print_output(self, message) -> None:
+	# 	print(message)
+	#
+	def thread_complete(self):
+		print("Thread complete successful!")
+	#
+	# def progress_fn(self, number):
+	# 	print(f'{number} done')
+
+
+	def get_data_from_table_CC(self) -> list:
 		"""
 		:return: [(cell, data_cell),(cell, data_cell), ...]
 		"""

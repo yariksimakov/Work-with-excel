@@ -1,37 +1,6 @@
-import sys
-
-import openpyxl, os, traceback
+import openpyxl, os
 from settings.settings import XLSX, MAX_INDEX_EXCEL_FILE, XLSM
-from PySide6.QtCore import QObject, Slot, Signal, QThreadPool, QRunnable
 
-
-class WorkerSignals(QRunnable):
-	finished = Signal()
-	error = Signal(tuple)
-	result = Signal(object)
-	progress = Signal(int)
-
-
-class Worker(QRunnable):
-	def __init__(self, fn, *args, **kwargs):
-		super().__init__()
-		self.fn = fn
-		self.args = args
-		self.kwargs = kwargs
-		self.signals = WorkerSignals()
-
-	@Slot()
-	def run(self):
-		try:
-			result = self.fn(*self.args, **self.kwargs)
-		except:
-			traceback.print_exc()
-		# 	exctype, value = sys.exc_info()[:2]
-		# 	self.signals.error.emit((exctype, value, traceback.format_exc()))
-		# else:
-		# 	self.signals.result.emit(result)
-		# finally:
-		# 	self.signals.finished.emit()
 
 
 class GetExpandedFile:
@@ -62,9 +31,6 @@ class ModifyExistingExcelFile(GetExpandedFile):
 	def __init__(self, path_to_directory: str, template_excel_file: str,
 				 name_new_file: str, name_sheet='Сопроводительный лист'):
 
-		self.threadpool = QThreadPool()
-		print(f"Multithreading with maxim {self.threadpool.maxThreadCount()} threads")
-
 		self.last_index_file = self.get_index_for_last_file(path_to_directory, name_new_file)
 		self.path_to_create_new_file = path_to_directory + r'\\' + name_new_file
 
@@ -83,17 +49,15 @@ class ModifyExistingExcelFile(GetExpandedFile):
 			self.wb.save(self.path_to_create_new_file + f'.{self.last_index_file + 1}' + XLSX)
 
 
-def test_start():
-	create_excel_file = ModifyExistingExcelFile(r'D:\Work with excel\Work-with-excel\test direction',
-												r'test direction/Krasnopol.xlsm',
-												'0001')
-	create_excel_file.mode_excel_file("A20", 'Na montag')
-	create_excel_file.save_changed_excel_file()
-
 
 if __name__ == '__main__':
+	def test_start():
+		create_excel_file = ModifyExistingExcelFile(r'D:\Work with excel\Work-with-excel\test direction',
+													r'test direction/Krasnopol.xlsm',
+													'0001')
+		create_excel_file.mode_excel_file("A20", 'Na montag')
+		create_excel_file.save_changed_excel_file()
 
-	# Worker()
 	test_start()
 # test = GetExpandedFile().get_index_for_last_file(test_direction, file_name)
 # pass
