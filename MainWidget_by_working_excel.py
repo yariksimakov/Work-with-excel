@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'MainWidget_by_working_excel.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.7.3
+## Created by: Qt User Interface Compiler version 6.8.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -16,16 +16,16 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QGroupBox, QHBoxLayout, QHeaderView,
-    QLabel, QLayout, QLineEdit, QMainWindow,
-    QMenuBar, QPushButton, QSizePolicy, QSpacerItem,
-    QStatusBar, QTableWidget, QTableWidgetItem, QVBoxLayout,
-    QWidget)
+    QLabel, QLayout, QLineEdit, QListWidget,
+    QListWidgetItem, QMainWindow, QMenuBar, QPushButton,
+    QSizePolicy, QStatusBar, QTableWidget, QTableWidgetItem,
+    QVBoxLayout, QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(864, 585)
+        MainWindow.resize(920, 600)
         sizePolicy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -102,8 +102,10 @@ class Ui_MainWindow(object):
         self.groupBox_2 = QGroupBox(self.centralwidget)
         self.groupBox_2.setObjectName(u"groupBox_2")
         self.groupBox_2.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.horizontalLayout_2 = QHBoxLayout(self.groupBox_2)
-        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
+        self.horizontalLayout_3 = QHBoxLayout(self.groupBox_2)
+        self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
+        self.verticalLayout_5 = QVBoxLayout()
+        self.verticalLayout_5.setObjectName(u"verticalLayout_5")
         self.tableWidget_CC = QTableWidget(self.groupBox_2)
         if (self.tableWidget_CC.columnCount() < 6):
             self.tableWidget_CC.setColumnCount(6)
@@ -132,36 +134,67 @@ class Ui_MainWindow(object):
         __qtablewidgetitem10 = QTableWidgetItem()
         self.tableWidget_CC.setVerticalHeaderItem(4, __qtablewidgetitem10)
         self.tableWidget_CC.setObjectName(u"tableWidget_CC")
+        self.tableWidget_CC.setShowGrid(True)
+        self.tableWidget_CC.setGridStyle(Qt.PenStyle.SolidLine)
+        self.tableWidget_CC.setSortingEnabled(False)
+        self.tableWidget_CC.setWordWrap(True)
+        self.tableWidget_CC.horizontalHeader().setCascadingSectionResizes(False)
 
-        self.horizontalLayout_2.addWidget(self.tableWidget_CC)
+        self.verticalLayout_5.addWidget(self.tableWidget_CC)
+
+        self.horizontalLayout_2 = QHBoxLayout()
+        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
+        self.add_new_line = QPushButton(self.groupBox_2)
+        self.add_new_line.setObjectName(u"add_new_line")
+
+        self.horizontalLayout_2.addWidget(self.add_new_line)
+
+        self.del_last_line = QPushButton(self.groupBox_2)
+        self.del_last_line.setObjectName(u"del_last_line")
+
+        self.horizontalLayout_2.addWidget(self.del_last_line)
+
+        self.save_cell = QPushButton(self.groupBox_2)
+        self.save_cell.setObjectName(u"save_cell")
+
+        self.horizontalLayout_2.addWidget(self.save_cell)
+
+
+        self.verticalLayout_5.addLayout(self.horizontalLayout_2)
+
+
+        self.horizontalLayout_3.addLayout(self.verticalLayout_5)
 
         self.verticalLayout_3 = QVBoxLayout()
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
-        self.verticalLayout_3.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)
-        self.verticalSpacer = QSpacerItem(20, 98, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+        self.listWidget = QListWidget(self.groupBox_2)
+        self.listWidget.setObjectName(u"listWidget")
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Expanding)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.listWidget.sizePolicy().hasHeightForWidth())
+        self.listWidget.setSizePolicy(sizePolicy1)
+        self.listWidget.setMaximumSize(QSize(300, 16777215))
 
-        self.verticalLayout_3.addItem(self.verticalSpacer)
+        self.verticalLayout_3.addWidget(self.listWidget)
 
         self.label_number_CC = QLabel(self.groupBox_2)
         self.label_number_CC.setObjectName(u"label_number_CC")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Preferred)
-        sizePolicy1.setHorizontalStretch(0)
-        sizePolicy1.setVerticalStretch(0)
-        sizePolicy1.setHeightForWidth(self.label_number_CC.sizePolicy().hasHeightForWidth())
-        self.label_number_CC.setSizePolicy(sizePolicy1)
-        self.label_number_CC.setMaximumSize(QSize(200, 16777215))
+        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+        sizePolicy2.setHorizontalStretch(0)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.label_number_CC.sizePolicy().hasHeightForWidth())
+        self.label_number_CC.setSizePolicy(sizePolicy2)
+        self.label_number_CC.setMaximumSize(QSize(300, 16777215))
         self.label_number_CC.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.verticalLayout_3.addWidget(self.label_number_CC)
 
         self.lineEdit_number_CC = QLineEdit(self.groupBox_2)
         self.lineEdit_number_CC.setObjectName(u"lineEdit_number_CC")
-        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
-        sizePolicy2.setHorizontalStretch(0)
-        sizePolicy2.setVerticalStretch(0)
         sizePolicy2.setHeightForWidth(self.lineEdit_number_CC.sizePolicy().hasHeightForWidth())
         self.lineEdit_number_CC.setSizePolicy(sizePolicy2)
-        self.lineEdit_number_CC.setMaximumSize(QSize(200, 16777215))
+        self.lineEdit_number_CC.setMaximumSize(QSize(300, 16777215))
         self.lineEdit_number_CC.setMaxLength(200)
         self.lineEdit_number_CC.setFrame(True)
         self.lineEdit_number_CC.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -172,12 +205,12 @@ class Ui_MainWindow(object):
         self.pushButton_create_CC.setObjectName(u"pushButton_create_CC")
         sizePolicy2.setHeightForWidth(self.pushButton_create_CC.sizePolicy().hasHeightForWidth())
         self.pushButton_create_CC.setSizePolicy(sizePolicy2)
-        self.pushButton_create_CC.setMaximumSize(QSize(200, 16777215))
+        self.pushButton_create_CC.setMaximumSize(QSize(300, 16777215))
 
         self.verticalLayout_3.addWidget(self.pushButton_create_CC)
 
 
-        self.horizontalLayout_2.addLayout(self.verticalLayout_3)
+        self.horizontalLayout_3.addLayout(self.verticalLayout_3)
 
 
         self.verticalLayout_4.addWidget(self.groupBox_2)
@@ -223,7 +256,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 864, 27))
+        self.menubar.setGeometry(QRect(0, 0, 920, 27))
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(MainWindow)
         self.statusbar.setObjectName(u"statusbar")
@@ -257,6 +290,9 @@ class Ui_MainWindow(object):
         ___qtablewidgetitem4.setText(QCoreApplication.translate("MainWindow", u"Cell", None));
         ___qtablewidgetitem5 = self.tableWidget_CC.horizontalHeaderItem(5)
         ___qtablewidgetitem5.setText(QCoreApplication.translate("MainWindow", u"Data", None));
+        self.add_new_line.setText(QCoreApplication.translate("MainWindow", u"\u0414\u043e\u0431\u0430\u0432\u0438\u0442\u044c \u0441\u0442\u0440\u043e\u043a\u0443", None))
+        self.del_last_line.setText(QCoreApplication.translate("MainWindow", u"\u0423\u0434\u0430\u043b\u0438\u0442\u044c \u0441\u0442\u0440\u043e\u043a\u0443", None))
+        self.save_cell.setText(QCoreApplication.translate("MainWindow", u"\u0421\u043e\u0445\u0440\u0430\u043d\u0438\u0442\u044c \u044f\u0447\u0435\u0439\u043a\u0438", None))
         self.label_number_CC.setText(QCoreApplication.translate("MainWindow", u"\u041d\u043e\u043c\u0435\u0440 \u041a\u041f", None))
         self.pushButton_create_CC.setText(QCoreApplication.translate("MainWindow", u"\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u0444\u0430\u0439\u043b", None))
         self.groupBox_3.setTitle(QCoreApplication.translate("MainWindow", u"\u0421\u043e\u0437\u0434\u0430\u043d\u0438\u0435 \u0444\u0430\u0439\u043b\u043e\u0432 \u043f\u043e \u0448\u0430\u0431\u043b\u043e\u043d\u0443", None))

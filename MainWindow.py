@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import QMainWindow, QFileDialog, QLineEdit
-from PySide6.QtCore import Slot, Signal, Qt, QEvent, QThreadPool
+from PySide6.QtCore import Qt, QEvent, QThreadPool
 from PySide6.QtCore import QObject, Slot, Signal, QThreadPool, QRunnable
 from MainWidget_by_working_excel import Ui_MainWindow
 
@@ -8,7 +8,7 @@ from working_with_excel_file import ModifyExistingExcelFile
 import pickle, os, re, traceback, sys
 
 
-class WorkerSignals(QRunnable):
+class WorkerSignals(QObject):
 	finished = Signal()
 	error = Signal(tuple)
 	result = Signal(object)
@@ -22,10 +22,6 @@ class WorkerThreads(QRunnable):
 		self.args = args
 		self.kwargs = kwargs
 		self.signals = WorkerSignals()
-
-		self.threadpool = QThreadPool()
-		print(f"Multithreading with maxim {self.threadpool.maxThreadCount()} threads")
-
 	# self.kwargs['progress_callback'] = self.signals.progress
 
 	@Slot()
@@ -69,6 +65,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.pushButton_save_default_settings.clicked.connect(self.save_default_settings)
 
 		self.threadpool = QThreadPool()
+		# print(f"Multithreading with maxim {self.threadpool.maxThreadCount()} threads")
 		TableForWorkExcelFile(self)
 		self.tableWidget_CC.installEventFilter(self)
 		self.pushButton_create_CC.clicked.connect(self.create_excel_file_by_template_using_external_thread)
@@ -89,6 +86,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 			return super().eventFilter(source, event)
 		return super().eventFilter(source, event)
 
+	@Slot()
 	def create_excel_file_by_template_using_external_thread(self):
 		data_table_CC = self.get_data_from_table_CC()
 		name_new_excel_file = self.lineEdit_number_CC.text()
@@ -103,10 +101,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		worker = WorkerThreads(self.create_excel_file_by_template,
 							   path_creating_file, excel_template,
 							   name_new_excel_file, data_table_CC)
+
+		worker.signals.finished.connect(self.thread_complete)
 		self.threadpool.start(worker)
 
 		# worker.signals.result.connect(self.print_output)
-		worker.signals.finished.connect(self.thread_complete)
 		# worker.signals.progress.connect()
 
 	def create_excel_file_by_template(self, path_creating_file, excel_template, name_new_excel_file, data_table_CC):

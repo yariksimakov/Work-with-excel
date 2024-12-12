@@ -15,3 +15,5 @@ def generate_from_ui_by_py(path: str):
 		cmd = f"pyside6-uic {file_path} -o {path}{os.sep}{file_name_without_extension}.py"
 		os.popen(cmd)
 
+if __name__ == '__main__':
+	generate_from_ui_by_py('D:\Work with excel\Work-with-excel')

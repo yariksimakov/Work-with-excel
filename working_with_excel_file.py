@@ -1,5 +1,5 @@
 import openpyxl, os
-from settings.settings import XLSX, MAX_INDEX_EXCEL_FILE, XLSM
+from settings.settings import EXPANDED_EXCEL_FILE, MAX_INDEX_EXCEL_FILE
 
 
 
@@ -18,12 +18,13 @@ class GetExpandedFile:
 			if index == 1:
 				""" Это необходимо так как индекс 1 у файлов небывает"""
 				continue
+
 			if index != 0:
 				file = file_check + f'.{index}'
 			else:
 				file = file_check
 
-			if not file + XLSX in set_files or not file + XLSM in set_files:
+			if not file + EXPANDED_EXCEL_FILE in set_files:
 				return index - 1
 
 
@@ -42,11 +43,11 @@ class ModifyExistingExcelFile(GetExpandedFile):
 
 	def save_changed_excel_file(self) -> None:
 		if self.last_index_file == -1:
-			self.wb.save(self.path_to_create_new_file + XLSX)
+			self.wb.save(self.path_to_create_new_file + EXPANDED_EXCEL_FILE)
 		elif self.last_index_file == 0:
-			self.wb.save(self.path_to_create_new_file + '.2' + XLSX)
+			self.wb.save(self.path_to_create_new_file + '.2' + EXPANDED_EXCEL_FILE)
 		else:
-			self.wb.save(self.path_to_create_new_file + f'.{self.last_index_file + 1}' + XLSX)
+			self.wb.save(self.path_to_create_new_file + f'.{self.last_index_file + 1}' + EXPANDED_EXCEL_FILE)
 
 
 
@@ -54,7 +55,7 @@ if __name__ == '__main__':
 	def test_start():
 		create_excel_file = ModifyExistingExcelFile(r'D:\Work with excel\Work-with-excel\test direction',
 													r'test direction/Krasnopol.xlsm',
-													'0001')
+													'00010')
 		create_excel_file.mode_excel_file("A20", 'Na montag')
 		create_excel_file.save_changed_excel_file()
 
