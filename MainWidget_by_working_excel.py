@@ -121,18 +121,19 @@ class Ui_MainWindow(object):
         self.tableWidget_CC.setHorizontalHeaderItem(4, __qtablewidgetitem4)
         __qtablewidgetitem5 = QTableWidgetItem()
         self.tableWidget_CC.setHorizontalHeaderItem(5, __qtablewidgetitem5)
-        if (self.tableWidget_CC.rowCount() < 5):
-            self.tableWidget_CC.setRowCount(5)
-        __qtablewidgetitem6 = QTableWidgetItem()
-        self.tableWidget_CC.setVerticalHeaderItem(0, __qtablewidgetitem6)
-        __qtablewidgetitem7 = QTableWidgetItem()
-        self.tableWidget_CC.setVerticalHeaderItem(1, __qtablewidgetitem7)
-        __qtablewidgetitem8 = QTableWidgetItem()
-        self.tableWidget_CC.setVerticalHeaderItem(2, __qtablewidgetitem8)
-        __qtablewidgetitem9 = QTableWidgetItem()
-        self.tableWidget_CC.setVerticalHeaderItem(3, __qtablewidgetitem9)
-        __qtablewidgetitem10 = QTableWidgetItem()
-        self.tableWidget_CC.setVerticalHeaderItem(4, __qtablewidgetitem10)
+        if (self.tableWidget_CC.rowCount() < 6):
+            self.tableWidget_CC.setRowCount(6)
+
+        # __qtablewidgetitem6 = QTableWidgetItem()
+        # self.tableWidget_CC.setVerticalHeaderItem(0, __qtablewidgetitem6)
+        # __qtablewidgetitem7 = QTableWidgetItem()
+        # self.tableWidget_CC.setVerticalHeaderItem(1, __qtablewidgetitem7)
+        # __qtablewidgetitem8 = QTableWidgetItem()
+        # self.tableWidget_CC.setVerticalHeaderItem(2, __qtablewidgetitem8)
+        # __qtablewidgetitem9 = QTableWidgetItem()
+        # self.tableWidget_CC.setVerticalHeaderItem(3, __qtablewidgetitem9)
+        # __qtablewidgetitem10 = QTableWidgetItem()
+        # self.tableWidget_CC.setVerticalHeaderItem(4, __qtablewidgetitem10)
         self.tableWidget_CC.setObjectName(u"tableWidget_CC")
         self.tableWidget_CC.setShowGrid(True)
         self.tableWidget_CC.setGridStyle(Qt.PenStyle.SolidLine)
@@ -144,20 +145,20 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_2 = QHBoxLayout()
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.add_new_line = QPushButton(self.groupBox_2)
-        self.add_new_line.setObjectName(u"add_new_line")
+        self.pushButton_add_new_line = QPushButton(self.groupBox_2)
+        self.pushButton_add_new_line.setObjectName(u"pushButton_add_new_line")
 
-        self.horizontalLayout_2.addWidget(self.add_new_line)
+        self.horizontalLayout_2.addWidget(self.pushButton_add_new_line)
 
-        self.del_last_line = QPushButton(self.groupBox_2)
-        self.del_last_line.setObjectName(u"del_last_line")
+        self.pushButton_del_last_line = QPushButton(self.groupBox_2)
+        self.pushButton_del_last_line.setObjectName(u"pushButton_del_last_line")
 
-        self.horizontalLayout_2.addWidget(self.del_last_line)
+        self.horizontalLayout_2.addWidget(self.pushButton_del_last_line)
 
-        self.save_cell = QPushButton(self.groupBox_2)
-        self.save_cell.setObjectName(u"save_cell")
+        self.pushButton_save_cell = QPushButton(self.groupBox_2)
+        self.pushButton_save_cell.setObjectName(u"pushButton_save_cell")
 
-        self.horizontalLayout_2.addWidget(self.save_cell)
+        self.horizontalLayout_2.addWidget(self.pushButton_save_cell)
 
 
         self.verticalLayout_5.addLayout(self.horizontalLayout_2)
@@ -167,16 +168,16 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_3 = QVBoxLayout()
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
-        self.listWidget = QListWidget(self.groupBox_2)
-        self.listWidget.setObjectName(u"listWidget")
+        self.listWidget_result = QListWidget(self.groupBox_2)
+        self.listWidget_result.setObjectName(u"listWidget_result")
         sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Expanding)
         sizePolicy1.setHorizontalStretch(0)
         sizePolicy1.setVerticalStretch(0)
-        sizePolicy1.setHeightForWidth(self.listWidget.sizePolicy().hasHeightForWidth())
-        self.listWidget.setSizePolicy(sizePolicy1)
-        self.listWidget.setMaximumSize(QSize(300, 16777215))
+        sizePolicy1.setHeightForWidth(self.listWidget_result.sizePolicy().hasHeightForWidth())
+        self.listWidget_result.setSizePolicy(sizePolicy1)
+        self.listWidget_result.setMaximumSize(QSize(300, 16777215))
 
-        self.verticalLayout_3.addWidget(self.listWidget)
+        self.verticalLayout_3.addWidget(self.listWidget_result)
 
         self.label_number_CC = QLabel(self.groupBox_2)
         self.label_number_CC.setObjectName(u"label_number_CC")
@@ -256,7 +257,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 920, 27))
+        self.menubar.setGeometry(QRect(0, 0, 917, 27))
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(MainWindow)
         self.statusbar.setObjectName(u"statusbar")
@@ -290,9 +291,10 @@ class Ui_MainWindow(object):
         ___qtablewidgetitem4.setText(QCoreApplication.translate("MainWindow", u"Cell", None));
         ___qtablewidgetitem5 = self.tableWidget_CC.horizontalHeaderItem(5)
         ___qtablewidgetitem5.setText(QCoreApplication.translate("MainWindow", u"Data", None));
-        self.add_new_line.setText(QCoreApplication.translate("MainWindow", u"\u0414\u043e\u0431\u0430\u0432\u0438\u0442\u044c \u0441\u0442\u0440\u043e\u043a\u0443", None))
-        self.del_last_line.setText(QCoreApplication.translate("MainWindow", u"\u0423\u0434\u0430\u043b\u0438\u0442\u044c \u0441\u0442\u0440\u043e\u043a\u0443", None))
-        self.save_cell.setText(QCoreApplication.translate("MainWindow", u"\u0421\u043e\u0445\u0440\u0430\u043d\u0438\u0442\u044c \u044f\u0447\u0435\u0439\u043a\u0438", None))
+
+        self.pushButton_add_new_line.setText(QCoreApplication.translate("MainWindow", u"\u0414\u043e\u0431\u0430\u0432\u0438\u0442\u044c \u0441\u0442\u0440\u043e\u043a\u0443", None))
+        self.pushButton_del_last_line.setText(QCoreApplication.translate("MainWindow", u"\u0423\u0434\u0430\u043b\u0438\u0442\u044c \u0441\u0442\u0440\u043e\u043a\u0443", None))
+        self.pushButton_save_cell.setText(QCoreApplication.translate("MainWindow", u"\u0421\u043e\u0445\u0440\u0430\u043d\u0438\u0442\u044c \u044f\u0447\u0435\u0439\u043a\u0438", None))
         self.label_number_CC.setText(QCoreApplication.translate("MainWindow", u"\u041d\u043e\u043c\u0435\u0440 \u041a\u041f", None))
         self.pushButton_create_CC.setText(QCoreApplication.translate("MainWindow", u"\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u0444\u0430\u0439\u043b", None))
         self.groupBox_3.setTitle(QCoreApplication.translate("MainWindow", u"\u0421\u043e\u0437\u0434\u0430\u043d\u0438\u0435 \u0444\u0430\u0439\u043b\u043e\u0432 \u043f\u043e \u0448\u0430\u0431\u043b\u043e\u043d\u0443", None))

@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QMainWindow, QFileDialog, QLineEdit
+from PySide6.QtWidgets import QMainWindow, QFileDialog, QLineEdit, QMessageBox
 from PySide6.QtCore import Qt, QEvent, QThreadPool
 from PySide6.QtCore import QObject, Slot, Signal, QThreadPool, QRunnable
 from MainWidget_by_working_excel import Ui_MainWindow
@@ -11,7 +11,6 @@ import pickle, os, re, traceback, sys
 class WorkerSignals(QObject):
 	finished = Signal()
 	error = Signal(tuple)
-	result = Signal(object)
 	progress = Signal(int)
 
 
@@ -27,13 +26,11 @@ class WorkerThreads(QRunnable):
 	@Slot()
 	def run(self):
 		try:
-			result = self.fn(*self.args, **self.kwargs)
+			self.fn(*self.args, **self.kwargs)
 		except:
 			traceback.print_exc()
 			exctype, value = sys.exc_info()[:2]
 			self.signals.error.emit((exctype, value, traceback.format_exc()))
-		else:
-			self.signals.result.emit(result)
 		finally:
 			self.signals.finished.emit()
 
@@ -68,6 +65,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		# print(f"Multithreading with maxim {self.threadpool.maxThreadCount()} threads")
 		TableForWorkExcelFile(self)
 		self.tableWidget_CC.installEventFilter(self)
+		self.pushButton_add_new_line.clicked.connect(self.add_new_line)
+		self.pushButton_del_last_line.clicked.connect(self.del_last_line)
+
 		self.pushButton_create_CC.clicked.connect(self.create_excel_file_by_template_using_external_thread)
 
 	def eventFilter(self, source, event):
@@ -102,11 +102,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 							   path_creating_file, excel_template,
 							   name_new_excel_file, data_table_CC)
 
+		worker.signals.error.connect(self.print_output)
 		worker.signals.finished.connect(self.thread_complete)
-		self.threadpool.start(worker)
 
+		self.threadpool.start(worker)
 		# worker.signals.result.connect(self.print_output)
-		# worker.signals.progress.connect()
 
 	def create_excel_file_by_template(self, path_creating_file, excel_template, name_new_excel_file, data_table_CC):
 		create_new_excel_file = ModifyExistingExcelFile(path_creating_file, excel_template, name_new_excel_file)
@@ -117,15 +117,26 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		create_new_excel_file.save_changed_excel_file()
 
 
-	# def print_output(self, message) -> None:
-	# 	print(message)
-	#
+	def print_output(self, *args, **kwargs) -> None:
+		print(args)
+		print(kwargs)
+
 	def thread_complete(self):
 		print("Thread complete successful!")
-	#
-	# def progress_fn(self, number):
-	# 	print(f'{number} done')
 
+	@Slot()
+	def add_new_line(self) -> None:
+		row_podition = self.tableWidget_CC.rowCount()
+		self.tableWidget_CC.insertRow(row_podition)
+
+	@Slot()
+	def del_last_line(self) -> None:
+		max_row = self.tableWidget_CC.rowCount()
+		if max_row == 0:
+			item = QMessageBox.warning(self, 'Внимание', "<b style='color: red;'> Нельзя удалить то чего нету!</b>")
+			self.listWidget_result.addItem(item)
+		else:
+			self.tableWidget_CC.removeRow(max_row-1)
 
 	def get_data_from_table_CC(self) -> list:
 		"""
@@ -166,9 +177,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 	@Slot()
 	def save_default_settings(self):
-		if not self.get_bool_checking_directory(DIRECTION_BY_SAVE):
-			os.mkdir(DIRECTION_BY_SAVE)
-
 		data_line = (self.lineEdit_excel_template.text(),
 					 self.lineEdit_path_creating_file.text(),
 					 self.lineEdit_plate_info.text())
@@ -193,5 +201,4 @@ if __name__ == '__main__':
 	"""https://ru.stackoverflow.com/questions/1538874/%D0%9D%D0%B0%D0%B6%D0%B0%D1%82%D0%B8%D0%B5-%D0%BA%D0%BB%D0%B0%D0%B2%D0%B8%D1%88%D0%B8-enter-%D0%B2-%D1%82%D0%B0%D0%B1%D0%BB%D0%B8%D1%86%D0%B5-qtablewidget"""
 	with open('save_params/linEdit_excel_file.pkl', 'rb') as file:
 		param = pickle.load(file)
-
 	print(param)
