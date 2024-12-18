@@ -16,16 +16,19 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QGroupBox, QHBoxLayout, QHeaderView,
-    QLabel, QLayout, QLineEdit, QListWidget,
-    QListWidgetItem, QMainWindow, QMenuBar, QPushButton,
-    QSizePolicy, QStatusBar, QTableWidget, QTableWidgetItem,
-    QVBoxLayout, QWidget)
+                               QLabel, QLayout, QLineEdit, QListWidget,
+                               QListWidgetItem, QMainWindow, QMenuBar, QPushButton,
+                               QSizePolicy, QStatusBar, QTableWidget, QTableWidgetItem,
+                               QVBoxLayout, QWidget, QTextEdit)
+from settings.settings import path_to_file_save_table_data
+import json
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(920, 600)
+        MainWindow.resize(970, 600)
         sizePolicy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -121,8 +124,30 @@ class Ui_MainWindow(object):
         self.tableWidget_CC.setHorizontalHeaderItem(4, __qtablewidgetitem4)
         __qtablewidgetitem5 = QTableWidgetItem()
         self.tableWidget_CC.setHorizontalHeaderItem(5, __qtablewidgetitem5)
-        if (self.tableWidget_CC.rowCount() < 6):
-            self.tableWidget_CC.setRowCount(6)
+
+        try:
+            with open(path_to_file_save_table_data, 'r') as file:
+                dictionary = json.load(file)
+            data: list = dictionary['data_table_save']
+            rows: int = len(data)
+            
+            if self.tableWidget_CC.rowCount() <= rows:
+                self.tableWidget_CC.setRowCount(rows + 1)
+            if data:
+                for row in range(rows):
+                    column: int = 0
+                    for cell_location, data_for_cell in data[row]:
+                        if cell_location is not None:
+                            self.tableWidget_CC.setItem(row, column, QTableWidgetItem(cell_location))
+                            # self.tableWidget_CC.setCellWidget(row, column, QTextEdit(cell_location))
+                        if data_for_cell is not None:
+                            self.tableWidget_CC.setItem(row, column+1, QTableWidgetItem(data_for_cell))
+                            # self.tableWidget_CC.setCellWidget(row, column+1, QTextEdit(data_for_cell))
+                        column += 2
+        except FileNotFoundError('Вы еще не сохраняли табличные данные') as err:
+            if self.tableWidget_CC.rowCount() < 6:
+                self.tableWidget_CC.setRowCount(6)
+            print(err)
 
         # __qtablewidgetitem6 = QTableWidgetItem()
         # self.tableWidget_CC.setVerticalHeaderItem(0, __qtablewidgetitem6)
@@ -134,6 +159,7 @@ class Ui_MainWindow(object):
         # self.tableWidget_CC.setVerticalHeaderItem(3, __qtablewidgetitem9)
         # __qtablewidgetitem10 = QTableWidgetItem()
         # self.tableWidget_CC.setVerticalHeaderItem(4, __qtablewidgetitem10)
+
         self.tableWidget_CC.setObjectName(u"tableWidget_CC")
         self.tableWidget_CC.setShowGrid(True)
         self.tableWidget_CC.setGridStyle(Qt.PenStyle.SolidLine)
@@ -170,7 +196,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
         self.listWidget_result = QListWidget(self.groupBox_2)
         self.listWidget_result.setObjectName(u"listWidget_result")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Expanding)
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         sizePolicy1.setHorizontalStretch(0)
         sizePolicy1.setVerticalStretch(0)
         sizePolicy1.setHeightForWidth(self.listWidget_result.sizePolicy().hasHeightForWidth())
@@ -246,10 +272,10 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_5.addLayout(self.horizontalLayout_4)
 
-        self.pushButton_create_file = QPushButton(self.groupBox_3)
-        self.pushButton_create_file.setObjectName(u"pushButton_create_file")
+        self.pushButton_create_files = QPushButton(self.groupBox_3)
+        self.pushButton_create_files.setObjectName(u"pushButton_create_file")
 
-        self.horizontalLayout_5.addWidget(self.pushButton_create_file)
+        self.horizontalLayout_5.addWidget(self.pushButton_create_files)
 
 
         self.verticalLayout_4.addWidget(self.groupBox_3)
@@ -300,6 +326,6 @@ class Ui_MainWindow(object):
         self.groupBox_3.setTitle(QCoreApplication.translate("MainWindow", u"\u0421\u043e\u0437\u0434\u0430\u043d\u0438\u0435 \u0444\u0430\u0439\u043b\u043e\u0432 \u043f\u043e \u0448\u0430\u0431\u043b\u043e\u043d\u0443", None))
         self.label_from.setText(QCoreApplication.translate("MainWindow", u"\u0421", None))
         self.label_to.setText(QCoreApplication.translate("MainWindow", u"\u041f\u041e", None))
-        self.pushButton_create_file.setText(QCoreApplication.translate("MainWindow", u"\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u0444\u0430\u0439\u043b\u044b", None))
+        self.pushButton_create_files.setText(QCoreApplication.translate("MainWindow", u"\u0421\u043e\u0437\u0434\u0430\u0442\u044c \u0444\u0430\u0439\u043b\u044b", None))
     # retranslateUi
 
