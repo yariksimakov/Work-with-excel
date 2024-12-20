@@ -1,5 +1,5 @@
-from PySide6.QtWidgets import QMainWindow, QFileDialog, QLineEdit, QMessageBox, QListWidgetItem
-from PySide6.QtCore import Qt, QEvent, QThreadPool
+from PySide6.QtWidgets import QMainWindow, QFileDialog, QMessageBox
+from PySide6.QtCore import Qt, QEvent
 from PySide6.QtCore import QObject, Slot, Signal, QThreadPool, QRunnable
 from MainWidget_by_working_excel import Ui_MainWindow
 import pickle, os, re, traceback, sys
@@ -57,11 +57,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.load_data_for_lineEdit()
 		self.signals = WorkerSignals()
 		self.signals.result.connect(self.print_output)
+		# self.signals.finished.connect(self.thread_complete)
 		
 		self.pushButton_excel_template.clicked.connect(self.open_dialog_box_excel_template)
 		self.pushButton_path_creating_file.clicked.connect(self.open_dialog_box_path_creating_file)
 		self.pushButton_plate_info.clicked.connect(self.open_dialog_box_plate_info)
-		self.pushButton_save_default_settings.clicked.connect(self.save_default_settings)
+		self.pushButton_save_default_settings.clicked.connect(self.save_by_default_paths)
 		
 		self.threadpool = QThreadPool()
 		# print(f"Multithreading with maxim {self.threadpool.maxThreadCount()} threads")
@@ -70,7 +71,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.pushButton_add_new_line.clicked.connect(self.add_new_line)
 		self.pushButton_del_last_line.clicked.connect(self.del_last_line)
 		self.pushButton_save_cell.clicked.connect(self.save_default_table_data)
-		self.pushButton_create_CC.clicked.connect(self.create_excel_file_by_template_using_external_thread)
+		self.pushButton_create_CC.clicked.connect(self.create_file_by_template_using_external_thread)
 		
 		self.pushButton_create_files.clicked.connect(self.create_files_by_template_using_external_thread)
 	
@@ -91,7 +92,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		return super().eventFilter(source, event)
 	
 	@Slot()
-	def create_excel_file_by_template_using_external_thread(self):
+	def create_file_by_template_using_external_thread(self):
 		data_table_CC = self.get_data_from_table_CC_without_None()
 		name_new_excel_file = self.lineEdit_number_CC.text()
 		
@@ -116,6 +117,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 	def create_files_by_template_using_external_thread(self):
 		name_from_excel_file = self.lineEdit_from.text()
 		name_to_excel_file = self.lineEdit_to.text()
+		path_creating_file = self.lineEdit_path_creating_file.text()
+		excel_template = self.lineEdit_excel_template.text()
 		
 		match_from = re.fullmatch(r'\d{5,}', name_from_excel_file)
 		match_to = re.fullmatch(r'\d{5,}', name_from_excel_file)
@@ -123,18 +126,22 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 			self.signals.result.emit("Неправильный номер КП")
 			raise ValueError('Неправильно набран номер эксель файла')
 		
-		path_creating_file = self.lineEdit_path_creating_file.text()
-		excel_template = self.lineEdit_excel_template.text()
-		
-		
+		# count_zero_from_excel_file = next(i for i, el in enumerate(name_from_excel_file) if el != '0')
+		length_name_file = len(name_from_excel_file)
 		for number_file in range(int(name_from_excel_file), int(name_to_excel_file)+1):
+			length_name_creating_file = len(str(number_file))
+			if  length_name_creating_file < length_name_file: # Проверка есть ли в номере файла нули перед цифрами
+				difference = length_name_file - length_name_creating_file
+				name_creating_file = '0'*difference + str(number_file)
+			else:
+				name_creating_file = str(number_file)
+				
 			worker = WorkerThreads(self.create_excel_file_by_template,
 								   path_creating_file, excel_template,
-								   str(number_file), [])
+								   name_creating_file, [])
 			worker.signals.error.connect(self.print_output)
 			self.threadpool.start(worker)
-		self.signals.finished.connect(self.thread_complete)
-		
+			worker.signals.finished.connect(self.thread_complete)
 		
 	def create_excel_file_by_template(self, path_creating_file, excel_template, name_new_excel_file, data_table_CC):
 		create_new_excel_file = ModifyExistingExcelFile(path_creating_file, excel_template, name_new_excel_file)
@@ -151,7 +158,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		# print(*args)
 	
 	def thread_complete(self):
-		self.listWidget_result.addItem('Файл создан успешно')
+		print('Работа внешнего потока завершена')
 		# print("Thread complete successful!")
 	
 	@Slot()
@@ -187,9 +194,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		while column_i <= columns:
 			for row_i in range(rows):
 				cell = table.item(row_i, column_i)
-				cell_data = table.item(row_i, column_i + 1)
-				if cell is not None and cell_data is not None:
-					data.append((cell.text(), cell_data.text()))
+				data_for_cell = table.item(row_i, column_i + 1)
+				if cell is not None and data_for_cell is not None:
+					cell_text = cell.text()
+					data_for_cell_text = data_for_cell.text()
+					if cell_text and data_for_cell_text:
+						data.append((cell_text, data_for_cell_text))
 			column_i += 2
 		return data
 	
@@ -239,12 +249,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		return False
 	
 	@Slot()
-	def save_default_settings(self):
+	def save_by_default_paths(self):
 		data_line = (self.lineEdit_excel_template.text(),
 					 self.lineEdit_path_creating_file.text(),
 					 self.lineEdit_plate_info.text())
 		with open(path_to_file_save_lineEdit, 'wb') as file:
 			pickle.dump(data_line, file)
+		self.signals.result.emit("Настройки путей сохранены успешно")
 	
 	def load_data_for_lineEdit(self) -> None:
 		"""
@@ -252,7 +263,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		:return: None
 		"""
 		if not self.get_bool_checking_directory(DIRECTION_BY_SAVE):
-			self.save_default_settings()
+			self.save_by_default_paths()
 		
 		with open(path_to_file_save_lineEdit, 'rb') as file:
 			path_by_settings: tuple = pickle.load(file)
