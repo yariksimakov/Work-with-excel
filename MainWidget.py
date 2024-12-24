@@ -16,19 +16,16 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QGroupBox, QHBoxLayout, QHeaderView,
-                               QLabel, QLayout, QLineEdit, QListWidget,
-                               QListWidgetItem, QMainWindow, QMenuBar, QPushButton,
-                               QSizePolicy, QStatusBar, QTableWidget, QTableWidgetItem,
-                               QVBoxLayout, QWidget, QTextEdit)
-from settings.settings import path_to_file_save_table_data
-import json
-
+    QLabel, QLayout, QLineEdit, QMainWindow,
+    QMenuBar, QPushButton, QScrollArea, QSizePolicy,
+    QStatusBar, QTableWidget, QTableWidgetItem, QVBoxLayout,
+    QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(970, 600)
+        MainWindow.resize(1015, 610)
         sizePolicy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -124,31 +121,8 @@ class Ui_MainWindow(object):
         self.tableWidget_CC.setHorizontalHeaderItem(4, __qtablewidgetitem4)
         __qtablewidgetitem5 = QTableWidgetItem()
         self.tableWidget_CC.setHorizontalHeaderItem(5, __qtablewidgetitem5)
-
-        try:
-            with open(path_to_file_save_table_data, 'r') as file:
-                dictionary = json.load(file)
-            data: list = dictionary['data_table_save']
-            rows: int = len(data)
-            
-            if self.tableWidget_CC.rowCount() <= rows:
-                self.tableWidget_CC.setRowCount(rows + 1)
-            if data:
-                for row in range(rows):
-                    column: int = 0
-                    for cell_location, data_for_cell in data[row]:
-                        if cell_location is not None:
-                            self.tableWidget_CC.setItem(row, column, QTableWidgetItem(cell_location))
-                            # self.tableWidget_CC.setCellWidget(row, column, QTextEdit(cell_location))
-                        if data_for_cell is not None:
-                            self.tableWidget_CC.setItem(row, column+1, QTableWidgetItem(data_for_cell))
-                            # self.tableWidget_CC.setCellWidget(row, column+1, QTextEdit(data_for_cell))
-                        column += 2
-        except FileNotFoundError('Вы еще не сохраняли табличные данные') as err:
-            if self.tableWidget_CC.rowCount() < 6:
-                self.tableWidget_CC.setRowCount(6)
-            print(err)
-
+        # if (self.tableWidget_CC.rowCount() < 5):
+        #     self.tableWidget_CC.setRowCount(5)
         # __qtablewidgetitem6 = QTableWidgetItem()
         # self.tableWidget_CC.setVerticalHeaderItem(0, __qtablewidgetitem6)
         # __qtablewidgetitem7 = QTableWidgetItem()
@@ -159,7 +133,6 @@ class Ui_MainWindow(object):
         # self.tableWidget_CC.setVerticalHeaderItem(3, __qtablewidgetitem9)
         # __qtablewidgetitem10 = QTableWidgetItem()
         # self.tableWidget_CC.setVerticalHeaderItem(4, __qtablewidgetitem10)
-
         self.tableWidget_CC.setObjectName(u"tableWidget_CC")
         self.tableWidget_CC.setShowGrid(True)
         self.tableWidget_CC.setGridStyle(Qt.PenStyle.SolidLine)
@@ -194,16 +167,22 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_3 = QVBoxLayout()
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
-        self.listWidget_result = QListWidget(self.groupBox_2)
-        self.listWidget_result.setObjectName(u"listWidget_result")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.scrollArea = QScrollArea(self.groupBox_2)
+        self.scrollArea.setObjectName(u"scrollArea")
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Expanding)
         sizePolicy1.setHorizontalStretch(0)
         sizePolicy1.setVerticalStretch(0)
-        sizePolicy1.setHeightForWidth(self.listWidget_result.sizePolicy().hasHeightForWidth())
-        self.listWidget_result.setSizePolicy(sizePolicy1)
-        self.listWidget_result.setMaximumSize(QSize(300, 16777215))
+        sizePolicy1.setHeightForWidth(self.scrollArea.sizePolicy().hasHeightForWidth())
+        self.scrollArea.setSizePolicy(sizePolicy1)
+        self.scrollArea.setMinimumSize(QSize(350, 0))
+        self.scrollArea.setMaximumSize(QSize(400, 16777215))
+        self.scrollArea.setWidgetResizable(True)
+        self.scrollAreaWidgetContents_3 = QWidget()
+        self.scrollAreaWidgetContents_3.setObjectName(u"scrollAreaWidgetContents_3")
+        self.scrollAreaWidgetContents_3.setGeometry(QRect(0, 0, 348, 131))
+        self.scrollArea.setWidget(self.scrollAreaWidgetContents_3)
 
-        self.verticalLayout_3.addWidget(self.listWidget_result)
+        self.verticalLayout_3.addWidget(self.scrollArea)
 
         self.label_number_CC = QLabel(self.groupBox_2)
         self.label_number_CC.setObjectName(u"label_number_CC")
@@ -212,7 +191,7 @@ class Ui_MainWindow(object):
         sizePolicy2.setVerticalStretch(0)
         sizePolicy2.setHeightForWidth(self.label_number_CC.sizePolicy().hasHeightForWidth())
         self.label_number_CC.setSizePolicy(sizePolicy2)
-        self.label_number_CC.setMaximumSize(QSize(300, 16777215))
+        self.label_number_CC.setMaximumSize(QSize(350, 16777215))
         self.label_number_CC.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.verticalLayout_3.addWidget(self.label_number_CC)
@@ -221,7 +200,7 @@ class Ui_MainWindow(object):
         self.lineEdit_number_CC.setObjectName(u"lineEdit_number_CC")
         sizePolicy2.setHeightForWidth(self.lineEdit_number_CC.sizePolicy().hasHeightForWidth())
         self.lineEdit_number_CC.setSizePolicy(sizePolicy2)
-        self.lineEdit_number_CC.setMaximumSize(QSize(300, 16777215))
+        self.lineEdit_number_CC.setMaximumSize(QSize(350, 16777215))
         self.lineEdit_number_CC.setMaxLength(200)
         self.lineEdit_number_CC.setFrame(True)
         self.lineEdit_number_CC.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -232,7 +211,7 @@ class Ui_MainWindow(object):
         self.pushButton_create_CC.setObjectName(u"pushButton_create_CC")
         sizePolicy2.setHeightForWidth(self.pushButton_create_CC.sizePolicy().hasHeightForWidth())
         self.pushButton_create_CC.setSizePolicy(sizePolicy2)
-        self.pushButton_create_CC.setMaximumSize(QSize(300, 16777215))
+        self.pushButton_create_CC.setMaximumSize(QSize(350, 16777215))
 
         self.verticalLayout_3.addWidget(self.pushButton_create_CC)
 
@@ -283,7 +262,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 917, 27))
+        self.menubar.setGeometry(QRect(0, 0, 1010, 27))
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(MainWindow)
         self.statusbar.setObjectName(u"statusbar")
@@ -317,7 +296,6 @@ class Ui_MainWindow(object):
         ___qtablewidgetitem4.setText(QCoreApplication.translate("MainWindow", u"Cell", None));
         ___qtablewidgetitem5 = self.tableWidget_CC.horizontalHeaderItem(5)
         ___qtablewidgetitem5.setText(QCoreApplication.translate("MainWindow", u"Data", None));
-
         self.pushButton_add_new_line.setText(QCoreApplication.translate("MainWindow", u"\u0414\u043e\u0431\u0430\u0432\u0438\u0442\u044c \u0441\u0442\u0440\u043e\u043a\u0443", None))
         self.pushButton_del_last_line.setText(QCoreApplication.translate("MainWindow", u"\u0423\u0434\u0430\u043b\u0438\u0442\u044c \u0441\u0442\u0440\u043e\u043a\u0443", None))
         self.pushButton_save_cell.setText(QCoreApplication.translate("MainWindow", u"\u0421\u043e\u0445\u0440\u0430\u043d\u0438\u0442\u044c \u044f\u0447\u0435\u0439\u043a\u0438", None))
