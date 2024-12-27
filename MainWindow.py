@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QMainWindow, QFileDialog, QMessageBox, QTableWidgetItem
+from PySide6.QtWidgets import QMainWindow, QFileDialog, QMessageBox, QTableWidgetItem, QVBoxLayout, QLabel
 from PySide6.QtCore import Qt, QEvent
 from PySide6.QtCore import QObject, Slot, Signal, QThreadPool, QRunnable
 from MainWidget import Ui_MainWindow
@@ -7,11 +7,11 @@ import json
 
 # Мои файлы
 from settings.settings import DIRECTION_BY_SAVE, path_to_file_save_lineEdit, path_to_file_save_table_data
-from working_with_excel_file import ModifyExistingExcelFile
+from working_with_excel_file import ModifyExcelFileCreatedUsingTemplate, CreateManyExcelFilesByTemplate
 
 
 class WorkerSignals(QObject):
-	finished = Signal()
+	finished = Signal(str)
 	error = Signal(tuple)
 	result = Signal(object)
 
@@ -29,13 +29,13 @@ class WorkerThreads(QRunnable):
 	@Slot()
 	def run(self):
 		try:
-			self.fn(*self.args, **self.kwargs)
+			finished = self.fn(*self.args, **self.kwargs)
 		except:
 			traceback.print_exc()
 			exctype, value = sys.exc_info()[:2]
 			self.signals.error.emit((exctype, value, traceback.format_exc()))
 		finally:
-			self.signals.finished.emit()
+			self.signals.finished.emit(finished)
 
 
 class TableForWorkExcelFile():
@@ -97,6 +97,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 		self.pushButton_create_files.clicked.connect(self.create_files_by_template_using_external_thread)
 
+		self.vbox_layout = QVBoxLayout()
+		self.scrollAreaWidgetContents_3.setLayout(self.vbox_layout)
+		# self.scrollAreaWidgetContents_3
+
 	def eventFilter(self, source, event):
 		if (event.type() == QEvent.KeyPress and event.key() in (Qt.Key_Return, Qt.Key_Enter)):
 			current = self.tableWidget_CC.currentIndex()
@@ -144,46 +148,55 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		excel_template = self.lineEdit_excel_template.text()
 
 		match_from = re.fullmatch(r'\d{5,}', name_from_excel_file)
-		match_to = re.fullmatch(r'\d{5,}', name_from_excel_file)
+		match_to = re.fullmatch(r'\d{5,}', name_to_excel_file)
 		if not match_from or not match_to or int(name_from_excel_file) >= int(name_to_excel_file):
 			self.signals.result.emit("Неправильный номер КП")
 			raise ValueError('Неправильно набран номер эксель файла')
 
 		# count_zero_from_excel_file = next(i for i, el in enumerate(name_from_excel_file) if el != '0')
+		list_excel_names = []
 		length_name_file = len(name_from_excel_file)
-		# Это не разумно - переделать логику создание множества ексель файлов
 		for number_file in range(int(name_from_excel_file), int(name_to_excel_file) + 1):
 			length_name_creating_file = len(str(number_file))
+
 			if length_name_creating_file < length_name_file:  # Проверка есть ли в номере файла нули перед цифрами
 				difference = length_name_file - length_name_creating_file
 				name_creating_file = '0' * difference + str(number_file)
 			else:
 				name_creating_file = str(number_file)
+			list_excel_names.append(name_creating_file)
 
-			worker = WorkerThreads(self.create_excel_file_by_template,
-								   path_creating_file, excel_template,
-								   name_creating_file, [])
-			worker.signals.error.connect(self.print_output)
-			self.threadpool.start(worker)
-			worker.signals.finished.connect(self.thread_complete)
+		worker = WorkerThreads(self.create_excel_files_by_template,
+							   path_creating_file, excel_template,
+							   list_excel_names)
+		worker.signals.error.connect(self.print_output)
+		worker.signals.finished.connect(self.thread_complete)
+		self.threadpool.start(worker)
 
 	def create_excel_file_by_template(self, path_creating_file, excel_template, name_new_excel_file, data_table_CC):
-		create_new_excel_file = ModifyExistingExcelFile(path_creating_file, excel_template, name_new_excel_file)
+		create_new_excel_file = ModifyExcelFileCreatedUsingTemplate(path_creating_file, excel_template, name_new_excel_file)
 		if data_table_CC:
 			for cell, data in data_table_CC:
 				create_new_excel_file.mode_excel_file(cell, data)
+		create_new_excel_file.save_excel_file
+		return f'Эксель файл {name_new_excel_file} успешно создан'
 
-		create_new_excel_file.save_changed_excel_file()
+	def create_excel_files_by_template(self, path_creating_file, excel_template, list_excel_names: list):
+		CreateManyExcelFilesByTemplate(path_creating_file, excel_template, list_excel_names)
+		string_excel_names = ''
+		for name in list_excel_names:
+			string_excel_names += name + ' '
+		return f'Файлы {string_excel_names} успешно созданы'
 
 	def print_output(self, *args, **kwargs) -> None:
 		# item = QMessageBox.warning(self, 'Внимание', "<b style='color: green;'>Сохранение прошло успешно</b>")
-		# self.listWidget_result.addItem(item)
-		# self.listWidget_result.addItems(args)
-		print(*args)
+		text = args[0]
+		self.vbox_layout.addWidget(QLabel(text))
 
-	def thread_complete(self):
+	def thread_complete(self, *args):
+		text = args[0]
+		self.vbox_layout.addWidget(QLabel(text))
 		print('Работа внешнего потока завершена')
-		# print("Thread complete successful!")
 
 	@Slot()
 	def add_new_line(self) -> None:
@@ -206,7 +219,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		dictionary = {'data_table_save': data_table_CC}
 		with open(path_to_file_save_table_data, 'w') as file:
 			json.dump(dictionary, file)
-		self.signals.result.emit("Таблица сохранена")
+		self.signals.result.emit("Таблица сохранена !")
 
 	def get_data_from_table_CC_without_None(self) -> list:
 		"""
